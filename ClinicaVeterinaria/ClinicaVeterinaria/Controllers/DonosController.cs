@@ -46,16 +46,65 @@ namespace ClinicaVeterinaria.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "DonoID,Nome,NIF")] Donos donos)
+        public ActionResult Create([Bind(Include = "Nome,NIF")] Donos dono)
         {
-            if (ModelState.IsValid)
+            //determinar o ID a atribuir ao novo 'dono'
+            int novoID = 0;
+            try
             {
-                db.Donos.Add(donos);
+                novoID = db.Donos.Max(d => d.DonoID) + 1;
+            }
+            catch (Exception)
+            {
+                //não existe dados na BD o MAX devolve Null
+                novoID=1;
+            }
+            
+            //outra forma
+            // novoID = db.Donos.Last().DonoID + 1;
+            //outra forma
+            // novoID = (from d in db.Donos
+            //           orderby d.DonoID descending
+            //           select d.DonoID).FirstOrDefault() + 1;
+            //outra forma
+            // novoID = db.Donos.OrderByDescending(d => d.DonoID).FirstOrDefault().DonoID + 1;
+
+            //atribuir o novoID ao 'dono'
+            dono.DonoID = novoID;
+            try
+            {
+            if (ModelState.IsValid) //confronta se os dados a ser introduzidos estão consisentes com o Model
+            {
+                //adicionar um novo 'dono'
+                db.Donos.Add(dono);
+                //guardar as alterações
                 db.SaveChanges();
+                //redireccionar para a página de início
                 return RedirectToAction("Index");
             }
-
-            return View(donos);
+            }
+            catch (Exception)
+            {
+                //cria uma mensagem de erro 
+                //a ser apresentada ao utilizador
+                ModelState.AddModelError("",
+                    string.Format("Ocorreu um erro na operação de guardar um novo Dono")
+                    );
+              /*adicionar a uma classe ERRO 
+               * -id
+               * -timestamp
+               * -operação que gerou o ERRO
+               * -mensagem de erro gerada pelo sistema (ex.Message)
+               * -qual o User que gerou o ERRO
+               * -...
+               * 
+               * ENVIAR email ao utilizador 'Admin' a avisar da ocorrência do erro
+               * 
+               * outras coisas consideradas importantes.....
+               * */
+            }
+            //se houver problemas, volta a VIEW do Create com os dados do 'dono'
+            return View(dono);
         }
 
         // GET: Donos/Edit/5
@@ -134,7 +183,7 @@ namespace ClinicaVeterinaria.Controllers
                 ModelState.AddModelError("",
                     string.Format("Ocorreu um erro na eliminação do Dono com ID={0}-{1}", id, dono.Nome)
                     );
-                //invoca a View, com os dados 'donos' atual
+                //invoca a View, com os dados 'dono' atual
                 return View(dono);          
             }
            
