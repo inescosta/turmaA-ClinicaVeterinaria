@@ -25,7 +25,7 @@ namespace ClinicaVeterinaria.Models
 
         [Required(ErrorMessage = "o {0} é de preenchimento obrigatório")]
         [Display(Name = "Nome do Dono do Animal")]
-        [RegularExpression("[A-ZÍÓÂ][a-záéíóúàèìòùâêîôûãõäëïöüç']+((-| )((de|da|do|dos) )?[A-ZÍÓÂ][a-záéíóúàèìòùâêîôûãõäëïöüç']+)* ", 
+        [RegularExpression("[A-ZÍÓÂ][a-záéíóúàèìòùâêîôûãõäëïöüç']+((-| )((de|da|do|dos) )?[A-ZÍÓÂ][a-záéíóúàèìòùâêîôûãõäëïöüç']+)*", 
             ErrorMessage = "No {0} só são aceites letras. Cada nome deve começar com letra maiúscula")]
         public string Nome { set; get; }
 
